@@ -142,7 +142,7 @@
     }
 
     static BOOL editMode = YES;
-    [self.tableView setEditing:editMode];
+    [self.tableView setEditing:editMode animated:YES];
     editMode = !editMode;
 }
 
