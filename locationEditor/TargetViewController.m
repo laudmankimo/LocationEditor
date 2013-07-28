@@ -15,6 +15,7 @@
 
 @implementation TargetViewController
 @synthesize my_mapView;
+@synthesize updateTimer;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,6 +32,29 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+
+	updateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+        target  :self
+        selector:@selector(timerMethod)
+        userInfo:nil
+        repeats :YES];
+}
+
+- (void)timerMethod
+{
+    if ((my_mapView.userLocation.coordinate.latitude != 0.0) &&
+        (my_mapView.userLocation.coordinate.longitude != 0.0)
+        )
+    {
+//        NSLog(@"lat = %f, lng = %f", my_mapView.userLocation.coordinate.latitude,
+//		  							   my_mapView.userLocation.coordinate.longitude);
+		CLLocationCoordinate2D center = my_mapView.userLocation.coordinate;
+		MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(center, 2000, 2000);
+		MKCoordinateRegion adjustedRegion = [my_mapView regionThatFits:viewRegion];
+		[my_mapView setRegion:adjustedRegion animated:YES];
+//        [my_mapView setCenterCoordinate:my_mapView.userLocation.coordinate animated:YES];
+        [updateTimer invalidate]; updateTimer = nil;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,20 +69,6 @@
 	[super viewDidUnload];
 }
 
--(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
-{
-    static BOOL first = YES;
-
-    if (first)
-    {
-        CLLocationCoordinate2D center = my_mapView.userLocation.coordinate;
-        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(center, 2000, 2000);
-        MKCoordinateRegion adjustedRegion = [my_mapView regionThatFits:viewRegion];
-        [my_mapView setRegion:adjustedRegion animated:YES];
-        first = NO;
-    }
-//  [my_mapView setCenterCoordinate:my_mapView.userLocation.coordinate animated:YES];
-}
 #pragma mark -
 #pragma mark MKMapViewDelegate
 
