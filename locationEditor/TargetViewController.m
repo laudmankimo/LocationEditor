@@ -32,7 +32,6 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-	my_mapView.delegate = self;
 
 	updateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
         target  :self
