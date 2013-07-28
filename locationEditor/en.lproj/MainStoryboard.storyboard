@@ -92,7 +92,8 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <gestureRecognizers/>
                                 <connections>
-                                    <outletCollection property="gestureRecognizers" destination="bqE-4f-BHQ" appends="YES" id="sDH-4G-rDC"/>
+                                    <outlet property="delegate" destination="E3f-IM-ZWA" id="RZZ-2Q-OhN"/>
+                                    <outletCollection property="gestureRecognizers" destination="bqE-4f-BHQ" appends="YES" id="384-1f-9ti"/>
                                 </connections>
                             </mapView>
                         </subviews>
@@ -100,15 +101,15 @@
                     </view>
                     <navigationItem key="navigationItem" title="Drag and Move Pins" id="WHL-D5-bAh"/>
                     <connections>
-                        <outlet property="my_mapView" destination="61O-x8-36i" id="pEy-h9-QPj"/>
+                        <outlet property="my_mapView" destination="61O-x8-36i" id="txI-nM-TOn"/>
                         <segue destination="mhA-Rs-T75" kind="modal" identifier="placemarkEditor" id="LxP-g8-1Rh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ntn-rf-GIc" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="bqE-4f-BHQ">
                     <connections>
-                        <action selector="longPressAct:" destination="E3f-IM-ZWA" id="XGY-0f-zfG"/>
-                        <outlet property="delegate" destination="E3f-IM-ZWA" id="ksT-zK-g3f"/>
+                        <action selector="longPressAct:" destination="E3f-IM-ZWA" id="Lkw-LF-eHT"/>
+                        <outlet property="delegate" destination="E3f-IM-ZWA" id="R7X-hE-kYf"/>
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
