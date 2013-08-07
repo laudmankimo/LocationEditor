@@ -136,14 +136,24 @@
 
 - (IBAction)editButtonClicked:(id)sender
 {
+    static BOOL editMode = YES;
     if ([arrayOfPlacemarks count] == 0)
     {
         return;
     }
 
-    static BOOL editMode = YES;
-    [self.tableView setEditing:editMode animated:YES];
-    editMode = !editMode;
+    if (editMode)
+    {
+		editMode = NO;
+        [self.tableView setEditing:NO animated:YES];
+        self.editModeButton.title = @"编辑";
+    }
+    else
+    {
+		editMode = YES;
+        [self.tableView setEditing:YES animated:YES];
+        self.editModeButton.title = @"完成";
+    }
 }
 
 - (void)passItemBack:(TargetViewController *)controller PinCoordinate:(CLLocationCoordinate2D)coordinate AnnotationName:(NSString *)name AnnotationDesc:(NSString *)desc
@@ -163,6 +173,7 @@
 - (void)viewDidUnload
 {
     [self setTableView:nil];
+	[self setEditModeButton:nil];
     [super viewDidUnload];
 }
 
