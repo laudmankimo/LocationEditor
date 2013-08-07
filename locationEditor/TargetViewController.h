@@ -19,10 +19,10 @@
 
 @end
 
-@interface TargetViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate, PlacemarkEditorDelegate>
+@interface TargetViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate, PlacemarkEditorDelegate, UISearchBarDelegate>
 
-@property (nonatomic, weak) IBOutlet MKMapView *my_mapView;
-@property (nonatomic, retain) NSTimer *updateTimer;
+@property (weak, nonatomic) IBOutlet MKMapView *my_mapView;
+@property (strong, nonatomic) NSTimer *updateTimer;
 @property (weak, nonatomic) id<TargetDelegate>delegate;
 
 - (IBAction)longPressAct:(id)sender;
