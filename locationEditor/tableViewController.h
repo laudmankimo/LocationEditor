@@ -12,8 +12,9 @@
 
 @interface tableViewController : UITableViewController <TargetDelegate>
 
-@property (nonatomic, retain) NSMutableArray *arrayOfPlacemarks;
+@property (strong, nonatomic) NSMutableArray *arrayOfPlacemarks;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *editModeButton;
 
 - (IBAction)addPlacemark:(id)sender;
 - (IBAction)editButtonClicked:(id)sender;
