@@ -90,7 +90,6 @@
 
 	// initial value
     annotation.title = @"点击按钮改变大头针名称";
-//    annotation.subtitle = [NSString stringWithFormat:@"(%f %f)", annotation.coordinate.latitude, annotation.coordinate.longitude];
 
     CLGeocoder  *myGecoder = [[CLGeocoder alloc] init];
     CLLocation  *mylocation = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
@@ -100,19 +99,15 @@
         if ((error == nil) && ([placemarks count] > 0))
         {
             CLPlacemark *placemark = [placemarks objectAtIndex:0];
-//            address.text = placemark.name;
+//			annotation.subtitle = [NSString stringWithFormat:@"%@", placemark.subThoroughfare];	// returns 277号
 			annotation.subtitle = [NSString stringWithFormat:@"%@", placemark.name];
-//			annotation.subtitle = [NSString stringWithFormat:@"%@ (%f %f)", placemark.name, annotation.coordinate.latitude, annotation.coordinate.longitude];
-
         }
         else if ((error == nil) && ([placemarks count] == 0))
         {
-//			address.text = @"No results were returned.";
 			annotation.subtitle = @"不是合理的地址";
         }
         else if (error != nil)
         {
-//			address.text = [NSString stringWithFormat:@"An error occurred = %@", error];
 			annotation.subtitle = [NSString stringWithFormat:@"错误代码 = %@", error];
         }
     }];
@@ -120,15 +115,34 @@
     [my_mapView addAnnotation:annotation];
 }
 
-//- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)annotationView didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
-//{
-//    if (oldState == MKAnnotationViewDragStateDragging)
-//	if (newState == MKAnnotationViewDragStateEnding) // user dragging the pin and release the pin
-//    {
-//        DDAnnotation *annotation = (DDAnnotation *)annotationView.annotation;
-//        annotation.subtitle = [NSString stringWithFormat:@"%f %f", annotation.coordinate.latitude, annotation.coordinate.longitude];
-//    }
-//}
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)annotationView didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
+{
+    if (newState == MKAnnotationViewDragStateEnding) // user dragging the pin and release the pin
+    {
+        DDAnnotation *annotation = (DDAnnotation *)annotationView.annotation;
+        annotation.subtitle = [NSString stringWithFormat:@"%f %f", annotation.coordinate.latitude, annotation.coordinate.longitude];
+
+        CLGeocoder  *myGecoder = [[CLGeocoder alloc] init];
+        CLLocation  *mylocation = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+
+        [myGecoder reverseGeocodeLocation:mylocation completionHandler:^(NSArray *placemarks, NSError *error)
+        {
+            if ((error == nil) && ([placemarks count] > 0))
+            {
+                CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                annotation.subtitle = [NSString stringWithFormat:@"%@", placemark.name];
+            }
+            else if ((error == nil) && ([placemarks count] == 0))
+            {
+                annotation.subtitle = @"不是合理的地址";
+            }
+            else if (error != nil)
+            {
+                annotation.subtitle = [NSString stringWithFormat:@"错误代码 = %@", error];
+            }
+        }];
+    }
+}
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
 {
@@ -164,21 +178,15 @@
 
 - (void)intoButtonAction:(UIButton *)sender;
 {
-//	NSLog(@"intoButtonAction");
-
- 	//根据 segue Identifier跳转界面
+//根据 segue Identifier跳转界面
 //    [self performSegueWithIdentifier:@"placemarkEditor" sender:self];
-
-	//以modal 方式跳转
+//以modal 方式跳转
 //    [self presentModalViewController:nil animated:YES];
-
-	//压进一个viewcontroller
+//压进一个viewcontroller
 //    [self.navigationController pushViewController:nil animated:YES];
-
-	//弹出一个viewcontroller  相当与返回上一个界面
+//弹出一个viewcontroller  相当与返回上一个界面
 //    [self.navigationController popViewControllerAnimated:YES];
-
-	// 以 modal跳转的返回方法
+// 以 modal跳转的返回方法
 //    [self dismissModalViewControllerAnimated:YES];
 	PlacemarkEditorViewController *placemarkVC = [self.storyboard instantiateViewControllerWithIdentifier:@"placemarkViewController"];
 
@@ -211,6 +219,77 @@
 	[self.navigationController popViewControllerAnimated:YES];
 //	[self dismissViewControllerAnimated:YES completion:nil];
 //	[self dismissModalViewControllerAnimated:YES];
+}
+
+#pragma mark - UISearchBarDelegate
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    CLGeocoder  *geocoder = [[CLGeocoder alloc] init];
+    __block NSString    *searchText = searchBar.text;
+
+	//copy your annotations to an array
+	NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:my_mapView.annotations];
+	//Remove the object userlocation
+	[annotationsToRemove removeObject:my_mapView.userLocation];
+	//Remove all annotations in the array from the mapView
+	[my_mapView removeAnnotations:annotationsToRemove];
+	annotationsToRemove = nil;
+
+    [geocoder geocodeAddressString:searchText completionHandler:^(NSArray *placemarks, NSError *error)
+    {
+		DDAnnotation *annotation = nil;
+		DDAnnotation *firstchoiceAnnotation = nil;
+		
+        if ((error == nil) && ([placemarks count] > 0))
+        {
+            for (CLPlacemark * aPlacemark in placemarks)
+            {
+                annotation = [[DDAnnotation alloc]initWithCoordinate:CLLocationCoordinate2DMake(aPlacemark.location.coordinate.latitude, aPlacemark.location.coordinate.longitude) addressDictionary:nil];
+
+                annotation.title = aPlacemark.name;
+                annotation.subtitle = [NSString stringWithFormat:@"%@", aPlacemark.name];
+                // annotation.subtitle = [NSString stringWithFormat:@"%@ (%f %f)", placemark.name, annotation.coordinate.latitude, annotation.coordinate.longitude];
+
+                [my_mapView addAnnotation:annotation];
+
+				if ([annotation.title isEqualToString:searchBar.text])
+				{
+					firstchoiceAnnotation = annotation;
+				}
+            }
+        }
+        else if ((error == nil) && ([placemarks count] == 0))
+        {
+			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"错误" message:@"没有找到指定的地址或是地标"
+			delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+			[alert show];
+        }
+        else if (error != nil)
+        {
+			NSString *errorMessage = [NSString stringWithFormat:@"%@", error];
+			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"错误" message:errorMessage
+			delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+			[alert show];
+        }
+
+        if (firstchoiceAnnotation != nil)
+        {
+            CLLocationCoordinate2D center = firstchoiceAnnotation.coordinate;
+            MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(center, 2000, 2000);
+            MKCoordinateRegion adjustedRegion = [my_mapView regionThatFits:viewRegion];
+            [my_mapView setRegion:adjustedRegion animated:YES];
+        }
+        else if (annotation != nil)
+        {
+            CLLocationCoordinate2D center = annotation.coordinate;
+            MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(center, 2000, 2000);
+            MKCoordinateRegion adjustedRegion = [my_mapView regionThatFits:viewRegion];
+            [my_mapView setRegion:adjustedRegion animated:YES];
+        }
+    }];
+
+    [searchBar resignFirstResponder];
 }
 
 @end
