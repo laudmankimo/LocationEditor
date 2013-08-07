@@ -29,7 +29,8 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-	self.placemarkName.text = self.nameFromTarget;
+//	self.placemarkName.text = self.nameFromTarget;
+	self.placemarkName.placeholder = self.nameFromTarget;
 	self.placemarkDesc.text = self.descFromTarget;
 }
 
