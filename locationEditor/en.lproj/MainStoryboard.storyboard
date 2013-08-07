@@ -45,7 +45,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Placemarks" id="QiU-cf-lHC">
-                        <barButtonItem key="leftBarButtonItem" title="Edit" id="E1p-1z-qyR">
+                        <barButtonItem key="leftBarButtonItem" title="编辑" id="E1p-1z-qyR">
                             <connections>
                                 <action selector="editButtonClicked:" destination="QCk-Fe-KP4" id="yka-Ap-rcz"/>
                             </connections>
@@ -57,6 +57,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="editModeButton" destination="E1p-1z-qyR" id="Zes-6x-NW7"/>
                         <outlet property="tableView" destination="Sjn-rR-Wz0" id="AcS-WW-TiD"/>
                     </connections>
                 </tableViewController>
@@ -222,6 +223,7 @@
             <relationships>
                 <relationship kind="action" name="addPlacemark:"/>
                 <relationship kind="action" name="editButtonClicked:"/>
+                <relationship kind="outlet" name="editMode" candidateClass="UIBarButtonItem"/>
                 <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
             </relationships>
         </class>
