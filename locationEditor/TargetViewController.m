@@ -46,14 +46,13 @@
         (my_mapView.userLocation.coordinate.longitude != 0.0)
         )
     {
-//        NSLog(@"lat = %f, lng = %f", my_mapView.userLocation.coordinate.latitude,
-//		  							   my_mapView.userLocation.coordinate.longitude);
 		CLLocationCoordinate2D center = my_mapView.userLocation.coordinate;
 		MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(center, 2000, 2000);
 		MKCoordinateRegion adjustedRegion = [my_mapView regionThatFits:viewRegion];
 		[my_mapView setRegion:adjustedRegion animated:YES];
-//        [my_mapView setCenterCoordinate:my_mapView.userLocation.coordinate animated:YES];
-        [updateTimer invalidate]; updateTimer = nil;
+//[my_mapView setCenterCoordinate:my_mapView.userLocation.coordinate animated:YES];
+        [updateTimer invalidate];
+		updateTimer = nil;
     }
 }
 
@@ -99,7 +98,7 @@
         if ((error == nil) && ([placemarks count] > 0))
         {
             CLPlacemark *placemark = [placemarks objectAtIndex:0];
-//			annotation.subtitle = [NSString stringWithFormat:@"%@", placemark.subThoroughfare];	// returns 277号
+
 			annotation.subtitle = [NSString stringWithFormat:@"%@", placemark.name];
         }
         else if ((error == nil) && ([placemarks count] == 0))
@@ -120,7 +119,6 @@
     if (newState == MKAnnotationViewDragStateEnding) // user dragging the pin and release the pin
     {
         DDAnnotation *annotation = (DDAnnotation *)annotationView.annotation;
-        annotation.subtitle = [NSString stringWithFormat:@"%f %f", annotation.coordinate.latitude, annotation.coordinate.longitude];
 
         CLGeocoder  *myGecoder = [[CLGeocoder alloc] init];
         CLLocation  *mylocation = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
@@ -188,6 +186,7 @@
 //    [self.navigationController popViewControllerAnimated:YES];
 // 以 modal跳转的返回方法
 //    [self dismissModalViewControllerAnimated:YES];
+
 	PlacemarkEditorViewController *placemarkVC = [self.storyboard instantiateViewControllerWithIdentifier:@"placemarkViewController"];
 
 	placemarkVC.delegate = self;
@@ -215,13 +214,18 @@
 			[self.delegate passItemBack:self PinCoordinate:pdda.location.coordinate AnnotationName:name AnnotationDesc:desc];
 		}
 	}
-
 	[self.navigationController popViewControllerAnimated:YES];
 //	[self dismissViewControllerAnimated:YES completion:nil];
 //	[self dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark - UISearchBarDelegate
+
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+	searchBar.text = nil;
+	[searchBar resignFirstResponder];
+}
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
@@ -247,9 +251,8 @@
             {
                 annotation = [[DDAnnotation alloc]initWithCoordinate:CLLocationCoordinate2DMake(aPlacemark.location.coordinate.latitude, aPlacemark.location.coordinate.longitude) addressDictionary:nil];
 
-                annotation.title = aPlacemark.name;
+				annotation.title = @"点击按钮改变大头针名称";
                 annotation.subtitle = [NSString stringWithFormat:@"%@", aPlacemark.name];
-                // annotation.subtitle = [NSString stringWithFormat:@"%@ (%f %f)", placemark.name, annotation.coordinate.latitude, annotation.coordinate.longitude];
 
                 [my_mapView addAnnotation:annotation];
 
