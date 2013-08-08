@@ -62,7 +62,7 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 
-    Place *a_place = [self.arrayOfPlacemarks objectAtIndex:indexPath.row];
+    Place *a_place = [self.arrayOfPlacemarks objectAtIndex:(NSUInteger) indexPath.row];
 
     cell.textLabel.text = a_place.name;
     cell.detailTextLabel.text = a_place.description;
@@ -83,7 +83,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         // Delete the row from the data source
-        [arrayOfPlacemarks removeObjectAtIndex:indexPath.row];
+        [arrayOfPlacemarks removeObjectAtIndex:(NSUInteger) indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 
         [self saveToPlist];
@@ -97,11 +97,10 @@
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 {
-    Place *place = [arrayOfPlacemarks objectAtIndex:fromIndexPath.row];
+    Place *place = [arrayOfPlacemarks objectAtIndex:(NSUInteger) fromIndexPath.row];
 
-    [arrayOfPlacemarks removeObjectAtIndex:fromIndexPath.row];
-    [arrayOfPlacemarks insertObject:place atIndex:toIndexPath.row];
-    place = nil;
+    [arrayOfPlacemarks removeObjectAtIndex:(NSUInteger) fromIndexPath.row];
+    [arrayOfPlacemarks insertObject:place atIndex:(NSUInteger) toIndexPath.row];
 
     [self saveToPlist];
 }
@@ -165,7 +164,6 @@
     newPlace.name = name;
     newPlace.description = desc;
     [arrayOfPlacemarks addObject:newPlace];
-    newPlace = nil;
     [self saveToPlist];
     [self.tableView reloadData];
 }
@@ -189,12 +187,10 @@
     {
         NSDictionary *dictionary = [NSDictionary dictionaryWithObjects:@[places.name, places.description, places.latitude, places.longitude] forKeys:@[@"name", @"desc", @"latitude", @"longitude"]];
         [saveDataArray addObject:dictionary];
-        dictionary = nil;
     }
 
     [saveDataArray writeToFile:filePath atomically:YES];
     [saveDataArray removeAllObjects];
-    saveDataArray = nil;
 }
 
 - (void)loadFromPlist
@@ -226,7 +222,6 @@
         place.latitude = [dict objectForKey:@"latitude"];
         place.longitude = [dict objectForKey:@"longitude"];
         [arrayOfPlacemarks addObject:place];
-        place = nil;
     }
 }
 
