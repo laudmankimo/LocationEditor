@@ -10,9 +10,4 @@
 
 @implementation Place
 
-@synthesize name;
-@synthesize description;
-@synthesize latitude;
-@synthesize longitude;
-
 @end
