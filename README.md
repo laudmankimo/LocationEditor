@@ -15,7 +15,7 @@ I dunno how to write this field 0.0", currently this software works fine, except
 
 ---
 
-* ---add UISearchBar to filter saved placemarks.--- ........................done
+* --add UISearchBar to filter saved placemarks.-- ........................done
 * add POI(Point Of Interests) search function (utilize google POI database) near your current location, such as 'McDonalds' in the UISearchBar
 
 ###Long-term goals
