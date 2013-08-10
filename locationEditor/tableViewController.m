@@ -13,8 +13,9 @@
 @end
 
 @implementation tableViewController
-@synthesize arrayOfPlacemarks;
+@synthesize arrayOfPlacemarks, displayItems;
 
+#pragma mark - view lifecycles
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -38,6 +39,10 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     arrayOfPlacemarks = [[NSMutableArray alloc]init];   // 0 objects
     [self loadFromPlist];
+	if ([arrayOfPlacemarks count] != 0)
+		displayItems = [[NSMutableArray alloc]initWithArray:arrayOfPlacemarks];
+	else
+		displayItems = [[NSMutableArray alloc]init];	// 0 objects;
 }
 
 - (void)didReceiveMemoryWarning
@@ -55,17 +60,19 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [arrayOfPlacemarks count];
+//    return [arrayOfPlacemarks count];
+	return [displayItems count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 
-    Place *a_place = [self.arrayOfPlacemarks objectAtIndex:(NSUInteger) indexPath.row];
+//    Place *place = [arrayOfPlacemarks objectAtIndex:(NSUInteger) indexPath.row];
+    Place *place = [displayItems objectAtIndex:(NSUInteger) indexPath.row];
 
-    cell.textLabel.text = a_place.name;
-    cell.detailTextLabel.text = a_place.description;
+    cell.textLabel.text = place.name;
+    cell.detailTextLabel.text = place.description;
 
     return cell;
 }
@@ -83,7 +90,12 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         // Delete the row from the data source
-        [arrayOfPlacemarks removeObjectAtIndex:(NSUInteger) indexPath.row];
+		// 1. get the object
+		Place *place = [displayItems objectAtIndex:(NSUInteger) indexPath.row];
+		// 2. then just remove the object, don't care about its real position in array
+		[arrayOfPlacemarks removeObject:place];
+		[displayItems removeObject:place];
+
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 
         [self saveToPlist];
@@ -97,10 +109,10 @@
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 {
-    Place *place = [arrayOfPlacemarks objectAtIndex:(NSUInteger) fromIndexPath.row];
+    Place *place = [arrayOfPlacemarks objectAtIndex:(NSUInteger)fromIndexPath.row];
 
-    [arrayOfPlacemarks removeObjectAtIndex:(NSUInteger) fromIndexPath.row];
-    [arrayOfPlacemarks insertObject:place atIndex:(NSUInteger) toIndexPath.row];
+    [arrayOfPlacemarks removeObjectAtIndex:(NSUInteger)fromIndexPath.row];
+    [arrayOfPlacemarks insertObject:place atIndex:(NSUInteger)toIndexPath.row];
 
     [self saveToPlist];
 }
@@ -109,7 +121,10 @@
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return NO if you do not want the item to be re-orderable.
-    return YES;
+	if ([self.mySearchBar.text length] != 0)
+		return NO; // when in filter mode, it does not permit rearrange the table's row
+	else
+		return YES;
 }
 
 #pragma mark - Table view delegate
@@ -163,7 +178,9 @@
     newPlace.longitude = [NSNumber numberWithDouble:coordinate.longitude];
     newPlace.name = name;
     newPlace.description = desc;
+
     [arrayOfPlacemarks addObject:newPlace];
+	[displayItems addObject:newPlace];
     [self saveToPlist];
     [self.tableView reloadData];
 }
@@ -172,6 +189,7 @@
 {
     [self setTableView:nil];
 	[self setEditModeButton:nil];
+	[self setMySearchBar:nil];
     [super viewDidUnload];
 }
 
@@ -223,6 +241,50 @@
         place.longitude = [dict objectForKey:@"longitude"];
         [arrayOfPlacemarks addObject:place];
     }
+}
+
+#pragma mark - UISearchBarDelegate function
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+	searchBar.text = nil;
+	[searchBar resignFirstResponder];
+}
+
+-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+//	searchBar.text = nil;
+	[searchBar resignFirstResponder];
+}
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+	if ([searchText length] == 0)
+	{
+		[displayItems removeAllObjects];
+		[displayItems addObjectsFromArray:arrayOfPlacemarks];
+	}
+	else
+	{
+		[displayItems removeAllObjects];
+		for (Place *place in arrayOfPlacemarks)
+		{
+			NSRange r = [place.name rangeOfString:searchText options:NSCaseInsensitiveSearch];	// filter by name
+
+			if (r.location != NSNotFound)
+			{
+				[displayItems addObject:place];
+				continue;
+			}
+			r = [place.description rangeOfString:searchText options:NSCaseInsensitiveSearch];	// filter by address
+			if (r.location != NSNotFound)
+			{
+				[displayItems addObject:place];
+				continue;
+			}
+		}
+	}
+	[self.tableView reloadData];
 }
 
 @end

@@ -10,11 +10,15 @@
 #import "Place.h"
 #import "TargetViewController.h"
 
-@interface tableViewController : UITableViewController <TargetDelegate>
+//@interface tableViewController : UIViewController <TargetDelegate>
+@interface tableViewController : UITableViewController
+	<TargetDelegate, UISearchBarDelegate>
 
 @property (strong, nonatomic) NSMutableArray *arrayOfPlacemarks;
+@property (strong, nonatomic) NSMutableArray *displayItems;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *editModeButton;
+@property (weak, nonatomic) IBOutlet UISearchBar *mySearchBar;
 
 - (IBAction)addPlacemark:(id)sender;
 - (IBAction)editButtonClicked:(id)sender;
